@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELMGHARY SHOP</title>
+    <style>
+        /* Basic Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f9; color: #333; line-height: 1.6; }
+        
+        /* Header Styling */
+        header { background-color: #0c0c0c; color: white; text-align: center; padding: 2rem 1rem; margin-bottom: 2rem; }
+        header h1 { margin-bottom: 0.5rem; }
+        
+        /* Store Layout */
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 1rem; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        
+        /* Product Card Styling */
+        .product-card { background: white; border-radius: 8px; padding: 1.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-5px); }
+        .product-image { width: 100%; height: 200px; object-fit: cover; border-radius: 4px; margin-bottom: 1rem; background-color: #eee; }
+        .product-title { font-size: 1.25rem; margin-bottom: 0.5rem; color: #222; }
+        .product-price { font-size: 1.2rem; font-weight: bold; color: #0c0c0c; margin-bottom: 1rem; }
+        
+        /* Buy Button */
+        .buy-btn { background-color: #0c0c0c; color: white; border: none; padding: 10px 20px; font-size: 1rem; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.3s; }
+        .buy-btn:hover { background-color: #333; }
+        
+        /* --- Modal (Popup Form) Styling --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; }
+        .modal-content { background: white; width: 90%; max-width: 500px; margin: 10% auto; padding: 2rem; border-radius: 8px; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #888; }
+        .close-btn:hover { color: #333; }
+        
+        .form-group { margin-bottom: 1rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; }
+        
+        /* Quantity Controls */
+        .qty-controls { display: flex; align-items: center; gap: 10px; }
+        .qty-btn { background: #eee; border: 1px solid #ccc; padding: 5px 15px; font-size: 1.2rem; cursor: pointer; border-radius: 4px; }
+        .qty-btn:hover { background: #ddd; }
+        .qty-input { width: 60px; text-align: center; font-weight: bold; padding: 8px; border: 1px solid #ccc; border-radius: 4px;}
+        
+        .submit-btn { background-color: #25D366; color: white; border: none; padding: 12px; width: 100%; font-size: 1.1rem; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 1rem; }
+        .submit-btn:hover { background-color: #1ebe57; }
+        
+        footer { text-align: center; padding: 2rem; margin-top: 3rem; background: #333; color: white; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ELMGHARY SHOP</h1>
+        <p>Simple, direct, and fast shopping.</p>
+    </header>
+
+    <div class="container">
+        <div class="product-grid">
+            <!-- Product 1 -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/250" alt="Product 1" class="product-image">
+                <h2 class="product-title">Classic Leather Watch</h2>
+                <p class="product-price">$45.00</p>
+                <button class="buy-btn" onclick="openCheckout('Classic Leather Watch', 45.00)">🛒 Buy Now</button>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/250" alt="Product 2" class="product-image">
+                <h2 class="product-title">Wireless Headphones</h2>
+                <p class="product-price">$89.99</p>
+                <button class="buy-btn" onclick="openCheckout('Wireless Headphones', 89.99)">🛒 Buy Now</button>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-card">
+                <img src="https://via.placeholder.com/250" alt="Product 3" class="product-image">
+                <h2 class="product-title">Minimalist Backpack</h2>
+                <p class="product-price">$35.00</p>
+                <button class="buy-btn" onclick="openCheckout('Minimalist Backpack', 35.00)">🛒 Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Checkout Form Popup -->
+    <div id="checkoutModal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeCheckout()">&times;</span>
+            <h2 id="modalProductTitle" style="margin-bottom: 1rem;">Complete Your Order</h2>
+            
+            <form id="orderForm" onsubmit="submitOrder(event)">
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <div class="qty-controls">
+                        <button type="button" class="qty-btn" onclick="changeQty(-1)">-</button>
+                        <input type="number" id="qty" class="qty-input" value="1" min="1" readonly>
+                        <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" id="custName" required placeholder="John Doe">
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="custPhone" required placeholder="+212...">
+                </div>
+
+                <div class="form-group">
+                    <label>Email (Optional)</label>
+                    <input type="email" id="custEmail" placeholder="email@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Full Delivery Address *</label>
+                    <textarea id="custAddress" rows="3" required placeholder="123 Main Street, City..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Place Order</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Elmghary Shop. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let currentProduct = "";
+        let currentPrice = 0;
+
+        function openCheckout(productName, price) {
+            currentProduct = productName;
+            currentPrice = price;
+            document.getElementById('modalProductTitle').innerText = `Order: ${productName}`;
+            document.getElementById('checkoutModal').style.display = 'block';
+            document.getElementById('qty').value = 1; 
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkoutModal').style.display = 'none';
+        }
+
+        function changeQty(change) {
+            let qtyInput = document.getElementById('qty');
+            let newQty = parseInt(qtyInput.value) + change;
+            if (newQty >= 1) {
+                qtyInput.value = newQty;
+            }
+        }
+
+        function submitOrder(event) {
+            event.preventDefault(); 
+
+            const orderData = {
+                id: 'ORD-' + Math.floor(Math.random() * 1000000), 
+                date: new Date().toLocaleString(),
+                product: currentProduct,
+                price: currentPrice,
+                quantity: document.getElementById('qty').value,
+                total: (currentPrice * document.getElementById('qty').value).toFixed(2),
+                name: document.getElementById('custName').value,
+                phone: document.getElementById('custPhone').value,
+                email: document.getElementById('custEmail').value,
+                address: document.getElementById('custAddress').value
+            };
+
+            let existingOrders = JSON.parse(localStorage.getItem('elmghary_orders')) || [];
+            existingOrders.push(orderData);
+            localStorage.setItem('elmghary_orders', JSON.stringify(existingOrders));
+
+            alert("Success! Your order has been placed.");
+            document.getElementById('orderForm').reset();
+            closeCheckout();
+        }
+    </script>
+</body>
+</html>
